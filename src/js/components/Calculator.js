@@ -11,16 +11,44 @@ class Calculator {
   constructor() {
     this.state = initialState;
     this.$total = document.getElementById('total');
+    this.$calculate = document.getElementById('calculate');
     this.$opertions = document.querySelector('.operations');
     this.$modifier = document.querySelector('.modifier');
     this.$digits = document.querySelector('.digits');
 
     this.onClickDigit();
+    this.onClickCalculateOperation();
     this.onClickOperation();
     this.onClickModifier();
   }
 
   onClickOperation() {
+    const onClickOperation = selectedOperation => {
+      const { total, operation } = this.state;
+
+      const isAlreadySelectedOperation = !!operation;
+
+      if (isAlreadySelectedOperation) {
+        alert(ERROR_MESSAGES.promptEnterNumberFirst);
+      } else {
+        this.setState({
+          ...this.state,
+          operation: selectedOperation,
+          total: total + selectedOperation,
+        });
+      }
+    };
+
+    this.$opertions.addEventListener('click', event => { 
+      const selectedOperation = event.target.textContent;
+      
+      if(selectedOperation !== OPERATIONS.CALCULATE) {
+        onClickOperation(selectedOperation);
+      }
+    });
+  }
+
+  onClickCalculateOperation() {
     const onClickCalculateOperation = () => {
       const { leftOperand, rightOperand, operation } = this.state;
 
@@ -43,29 +71,11 @@ class Calculator {
       }
     };
 
-    const onClickOperation = selectedOperation => {
-      const { total, operation } = this.state;
-
-      const isAlreadySelectedOperation = !!operation;
-
-      if (isAlreadySelectedOperation) {
-        alert(ERROR_MESSAGES.promptEnterNumberFirst);
-      } else {
-        this.setState({
-          ...this.state,
-          operation: selectedOperation,
-          total: total + selectedOperation,
-        });
-      }
-    };
-
-    this.$opertions.addEventListener('click', event => {
+    this.$calculate.addEventListener('click', event => {
       const selectedOperation = event.target.textContent;
 
-      if (selectedOperation === OPERATIONS.CALCULATE) {
+      if(selectedOperation === OPERATIONS.CALCULATE) {
         onClickCalculateOperation();
-      } else {
-        onClickOperation(selectedOperation);
       }
     });
   }
