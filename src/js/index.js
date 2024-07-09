@@ -1,3 +1,3 @@
-import Calculator from './components/Calculator.js';
+import Calculator from './calculator.js';
 
 new Calculator();

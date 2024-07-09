@@ -1,4 +1,5 @@
-import { OPERATIONS, ERROR_MESSAGES } from '../constants.js';
+import { OPERATIONS, ERROR_MESSAGES } from './constants.js';
+import { isOverLength, operators } from "./utils.js";
 
 const initialState = {
   total: '0',
@@ -54,19 +55,19 @@ class Calculator {
 
       switch (operation) {
         case OPERATIONS.PLUS:
-          this.setState({ ...this.state, total: leftOperand + rightOperand });
+          this.setState({ ...this.state, total: operators.plus(leftOperand, rightOperand) });
           return;
         case OPERATIONS.MINUS:
-          this.setState({ ...this.state, total: leftOperand - rightOperand });
+          this.setState({ ...this.state, total: operators.minus(leftOperand, rightOperand) });
           return;
         case OPERATIONS.DIVIDE:
           this.setState({
             ...this.state,
-            total: Math.floor(leftOperand / rightOperand),
+            total: operators.divide(leftOperand, rightOperand),
           });
           return;
         case OPERATIONS.MULTIPLE:
-          this.setState({ ...this.state, total: leftOperand * rightOperand });
+          this.setState({ ...this.state, total: operators.multiple(leftOperand, rightOperand)});
           return;
       }
     };
@@ -98,7 +99,7 @@ class Calculator {
         ? leftOperand + operation + rightOperand
         : leftOperand;
 
-      if (leftOperand?.length > 3 || rightOperand?.length > 3) {
+      if (isOverLength(leftOperand, 3) || isOverLength(rightOperand, 3)) {
         alert(ERROR_MESSAGES.numberLimitThree);
       } else {
         this.setState({
