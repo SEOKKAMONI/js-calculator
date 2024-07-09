@@ -39,10 +39,10 @@ class Calculator {
       }
     };
 
-    this.$opertions.addEventListener('click', event => { 
+    this.$opertions.addEventListener('click', event => {
       const selectedOperation = event.target.textContent;
-      
-      if(selectedOperation !== OPERATIONS.CALCULATE) {
+
+      if (selectedOperation !== OPERATIONS.CALCULATE) {
         onClickOperation(selectedOperation);
       }
     });
@@ -74,7 +74,7 @@ class Calculator {
     this.$calculate.addEventListener('click', event => {
       const selectedOperation = event.target.textContent;
 
-      if(selectedOperation === OPERATIONS.CALCULATE) {
+      if (selectedOperation === OPERATIONS.CALCULATE) {
         onClickCalculateOperation();
       }
     });
@@ -88,15 +88,17 @@ class Calculator {
 
       const isAlreadySelectedOperation = !!operation;
 
-      if(isAlreadySelectedOperation) {
+      if (isAlreadySelectedOperation) {
         rightOperand = getUpdatedOperand(rightOperand, selectedDigit);
       } else {
         leftOperand = getUpdatedOperand(leftOperand, selectedDigit);
       }
 
-      const total = isAlreadySelectedOperation ? leftOperand + operation + rightOperand : leftOperand;
+      const total = isAlreadySelectedOperation
+        ? leftOperand + operation + rightOperand
+        : leftOperand;
 
-      if(leftOperand?.length > 3 || rightOperand?.length > 3) {
+      if (leftOperand?.length > 3 || rightOperand?.length > 3) {
         alert(ERROR_MESSAGES.numberLimitThree);
       } else {
         this.setState({
