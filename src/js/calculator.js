@@ -16,7 +16,10 @@ class Calculator {
     this.$opertions = document.querySelector('.operations');
     this.$modifier = document.querySelector('.modifier');
     this.$digits = document.querySelector('.digits');
+    this.init();
+  }
 
+  init() {
     this.onClickDigit();
     this.onClickCalculateOperation();
     this.onClickOperation();
