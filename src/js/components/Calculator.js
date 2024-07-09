@@ -1,3 +1,5 @@
+import { OPERATIONS, ERROR_MESSAGES } from '../constants.js';
+
 const initialState = {
   total: '0',
   leftOperand: '0',
@@ -9,9 +11,9 @@ class Calculator {
   constructor() {
     this.state = initialState;
     this.$total = document.getElementById('total');
+    this.$opertions = document.querySelector('.operations');
     this.$modifier = document.querySelector('.modifier');
     this.$digits = document.querySelector('.digits');
-    this.$opertions = document.querySelector('.operations');
 
     this.onClickDigit();
     this.onClickOperation();
@@ -19,70 +21,85 @@ class Calculator {
   }
 
   onClickOperation() {
-    const onClickOperation = (event) => {
-      const value = event.target.textContent;
-      const { total, leftOperand, rightOperand, operation } = this.state;
+    const onClickCalculateOperation = () => {
+      const { leftOperand, rightOperand, operation } = this.state;
 
-      if (value === '=') {
-        switch (operation) {
-          case '+':
-            this.setState({ ...this.state, total: leftOperand + rightOperand });
-            return;
-          case '-':
-            this.setState({ ...this.state, total: leftOperand - rightOperand });
-            return;
-          case '/':
-            this.setState({
-              ...this.state,
-              total: Math.floor(leftOperand / rightOperand),
-            });
-            return;
-          case 'X':
-            this.setState({ ...this.state, total: leftOperand * rightOperand });
-            return;
-        }
-      }
-
-      if (!operation) {
-        this.setState({ ...this.state, operation: value, total: total + value });
-      } else {
-        alert('숫자를 먼저 입력한 후 연산자를 입력해주세요!');
+      switch (operation) {
+        case OPERATIONS.PLUS:
+          this.setState({ ...this.state, total: leftOperand + rightOperand });
+          return;
+        case OPERATIONS.MINUS:
+          this.setState({ ...this.state, total: leftOperand - rightOperand });
+          return;
+        case OPERATIONS.DIVIDE:
+          this.setState({
+            ...this.state,
+            total: Math.floor(leftOperand / rightOperand),
+          });
+          return;
+        case OPERATIONS.MULTIPLE:
+          this.setState({ ...this.state, total: leftOperand * rightOperand });
+          return;
       }
     };
 
-    this.$opertions.addEventListener('click', onClickOperation);
+    const onClickOperation = selectedOperation => {
+      const { total, operation } = this.state;
+
+      const isAlreadySelectedOperation = !!operation;
+
+      if (isAlreadySelectedOperation) {
+        alert(ERROR_MESSAGES.promptEnterNumberFirst);
+      } else {
+        this.setState({
+          ...this.state,
+          operation: selectedOperation,
+          total: total + selectedOperation,
+        });
+      }
+    };
+
+    this.$opertions.addEventListener('click', event => {
+      const selectedOperation = event.target.textContent;
+
+      if (selectedOperation === OPERATIONS.CALCULATE) {
+        onClickCalculateOperation();
+      } else {
+        onClickOperation(selectedOperation);
+      }
+    });
   }
 
   onClickDigit() {
-    const onClickDigit = (event) => {
-      const value = event.target.textContent;
-      const { leftOperand, rightOperand, operation, total } = this.state;
+    const onClickDigit = event => {
+      const selectedDigit = event.target.textContent;
+      let { leftOperand, rightOperand } = this.state;
+      const { operation } = this.state;
 
-      if (!operation) {
-        let accLeftOperand = leftOperand === '0' ? value : leftOperand + value;
+      const isAlreadySelectedOperation = !!operation;
 
-        if (accLeftOperand.length > 3) {
-          alert('숫자는 세 자리까지만 입력 가능합니다!');
-        } else {
-          this.setState({
-            ...this.state,
-            leftOperand: accLeftOperand,
-            total: accLeftOperand,
-          });
-        }
+      if(isAlreadySelectedOperation) {
+        rightOperand = getUpdatedOperand(rightOperand, selectedDigit);
       } else {
-        let accRightOperand = rightOperand === null ? value : rightOperand + value;
-
-        if (accRightOperand.length > 3) {
-          alert('숫자는 세 자리까지만 입력 가능합니다!');
-        } else {
-          this.setState({
-            ...this.state,
-            rightOperand: accRightOperand,
-            total: leftOperand + operation + accRightOperand,
-          });
-        }
+        leftOperand = getUpdatedOperand(leftOperand, selectedDigit);
       }
+
+      const total = isAlreadySelectedOperation ? leftOperand + operation + rightOperand : leftOperand;
+
+      if(leftOperand?.length > 3 || rightOperand?.length > 3) {
+        alert(ERROR_MESSAGES.numberLimitThree);
+      } else {
+        this.setState({
+          ...this.state,
+          leftOperand,
+          rightOperand,
+          total,
+        });
+      }
+    };
+
+    const getUpdatedOperand = (operand, selectedDigit) => {
+      return operand === null || operand === '0' ? selectedDigit : operand + selectedDigit;
     };
 
     this.$digits.addEventListener('click', onClickDigit);
@@ -90,7 +107,9 @@ class Calculator {
 
   onClickModifier() {
     const onClickModifier = () => {
-      this.setState(initialState);
+      if (this.state !== initialState) {
+        this.setState(initialState);
+      }
     };
 
     this.$modifier.addEventListener('click', onClickModifier);
